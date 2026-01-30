@@ -8,6 +8,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="WeatherFit">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
   <title>WeatherFit - Smart Outfit Recommendations</title>
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -950,8 +953,8 @@
         goodAfternoon: "Good Afternoon",
         goodEvening: "Good Evening",
         goodNight: "Good Night",
-        welcomeTitle: "Welcome to WeatherFit!",
-        welcomeSubtitle: "How would you like to set your location?",
+        welcomeTitle: "Choose Your Location",
+        welcomeSubtitle: "We couldn't access your automatic location. Please choose manually:",
         welcomeAutomatic: "Automatic Location",
         welcomeAutomaticDesc: "Use your phone's GPS",
         welcomeManual: "Choose Manually",
@@ -1031,8 +1034,8 @@
         goodAfternoon: "צהריים טובים",
         goodEvening: "ערב טוב",
         goodNight: "לילה טוב",
-        welcomeTitle: "!ברוך הבא ל-WeatherFit",
-        welcomeSubtitle: "איך תרצה להגדיר את המיקום?",
+        welcomeTitle: "בחר את המיקום שלך",
+        welcomeSubtitle: "לא הצלחנו לגשת למיקום האוטומטי שלך. אנא בחר ידנית:",
         welcomeAutomatic: "מיקום אוטומטי",
         welcomeAutomaticDesc: "השתמש ב-GPS של הטלפון",
         welcomeManual: "בחר ידנית",
@@ -1087,8 +1090,8 @@
       const [language, setLanguage] = useState('en');
       const [darkMode, setDarkMode] = useState(false);
       const [menuOpen, setMenuOpen] = useState(false);
-      const [showWelcome, setShowWelcome] = useState(true);
-      const [locationMode, setLocationMode] = useState(null); // 'auto' or 'manual'
+      const [showWelcome, setShowWelcome] = useState(false);
+      const [locationMode, setLocationMode] = useState('auto'); // Start with 'auto'
       const [showCitySelector, setShowCitySelector] = useState(false);
       const [citySearch, setCitySearch] = useState('');
       const [selectedCity, setSelectedCity] = useState(null);
@@ -1379,23 +1382,21 @@
         }
       }, [darkMode]);
 
-      // Check if user has previously set a location mode
+      // Automatically request location on app start
       useEffect(() => {
         const savedMode = localStorage.getItem('locationMode');
         const savedCity = localStorage.getItem('selectedCity');
         
-        if (savedMode) {
-          setLocationMode(savedMode);
-          setShowWelcome(false);
-          
-          if (savedMode === 'manual' && savedCity) {
-            const city = JSON.parse(savedCity);
-            setSelectedCity(city);
-            getWeatherByCoords(city.lat, city.lon);
-            setLocationLoaded(true);
-          } else if (savedMode === 'auto') {
-            getUserLocation();
-          }
+        if (savedMode === 'manual' && savedCity) {
+          // User previously chose manual mode
+          setLocationMode('manual');
+          const city = JSON.parse(savedCity);
+          setSelectedCity(city);
+          getWeatherByCoords(city.lat, city.lon);
+          setLocationLoaded(true);
+        } else {
+          // Always try automatic location first
+          getUserLocation();
         }
       }, []);
 
@@ -1522,7 +1523,8 @@
 
       const getUserLocation = () => {
         if (!navigator.geolocation) {
-          setError(t.errorLocation);
+          setLoading(false);
+          setShowWelcome(true);
           return;
         }
 
@@ -1534,21 +1536,8 @@
           },
           (err) => {
             setLoading(false);
-            let errorMessage = t.errorLocation;
-            
-            switch(err.code) {
-              case err.PERMISSION_DENIED:
-                errorMessage = t.errorPermission;
-                break;
-              case err.POSITION_UNAVAILABLE:
-                errorMessage = t.errorUnavailable;
-                break;
-              case err.TIMEOUT:
-                errorMessage = t.errorTimeout;
-                break;
-            }
-            
-            setError(errorMessage);
+            // Show welcome screen if geolocation fails
+            setShowWelcome(true);
           }
         );
       };
@@ -1731,12 +1720,7 @@
               <div className="welcome-content">
                 <h1 className="welcome-title">{t.welcomeTitle}</h1>
                 <p className="welcome-subtitle">{t.welcomeSubtitle}</p>
-                <div className="welcome-options">
-                  <div className="welcome-option" onClick={() => handleWelcomeChoice('auto')}>
-                    <div className="welcome-option-icon">📍</div>
-                    <div className="welcome-option-title">{t.welcomeAutomatic}</div>
-                    <div className="welcome-option-desc">{t.welcomeAutomaticDesc}</div>
-                  </div>
+                <div className="welcome-options" style={{justifyContent: 'center'}}>
                   <div className="welcome-option" onClick={() => handleWelcomeChoice('manual')}>
                     <div className="welcome-option-icon">🌍</div>
                     <div className="welcome-option-title">{t.welcomeManual}</div>
