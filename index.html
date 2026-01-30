@@ -603,7 +603,7 @@
     .weather-info {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
+      gap: 15px;
       margin-bottom: 25px;
     }
 
@@ -997,7 +997,13 @@
         errorPermission: "Location access denied. Please enable location permissions.",
         errorUnavailable: "Location information unavailable.",
         errorTimeout: "Location request timed out.",
-        errorFetch: "Failed to fetch weather data"
+        errorFetch: "Failed to fetch weather data",
+        installAlreadyInstalled: "App is already installed!",
+        installEdge: "In Edge:\n1. Click the three dots (...) menu\n2. Select \"Apps\"\n3. Click \"Install WeatherFit\"\n\nOr press Ctrl+Shift+A",
+        installChrome: "In Chrome:\n1. Click the three dots menu\n2. Select \"Install WeatherFit\"\n\nOr look for the install icon (⊕) in the address bar",
+        installSafari: "In Safari:\n1. Tap the Share button\n2. Scroll down and tap \"Add to Home Screen\"\n3. Tap \"Add\"",
+        installFirefox: "In Firefox:\n1. Tap the three dots menu\n2. Select \"Install\"\n\nOr look for the install icon in the address bar",
+        installGeneric: "To install this app:\n\nLook for an \"Install\" option in your browser menu, or an install icon in the address bar."
       },
       he: {
         title: "WeatherFit",
@@ -1078,7 +1084,13 @@
         errorPermission: "הגישה למיקום נדחתה. אנא אפשר הרשאות מיקום.",
         errorUnavailable: "מידע מיקום לא זמין.",
         errorTimeout: "בקשת המיקום פגה.",
-        errorFetch: "נכשל בשליפת נתוני מזג אוויר"
+        errorFetch: "נכשל בשליפת נתוני מזג אוויר",
+        installAlreadyInstalled: "האפליקציה כבר מותקנת!",
+        installEdge: "ב-Edge:\n1. לחץ על תפריט שלוש הנקודות (...)\n2. בחר \"אפליקציות\"\n3. לחץ על \"התקן WeatherFit\"\n\nאו לחץ Ctrl+Shift+A",
+        installChrome: "ב-Chrome:\n1. לחץ על תפריט שלוש הנקודות\n2. בחר \"התקן WeatherFit\"\n\nאו חפש את סמל ההתקנה (⊕) בשורת הכתובת",
+        installSafari: "ב-Safari:\n1. הקש על כפתור השיתוף\n2. גלול למטה והקש על \"הוסף למסך הבית\"\n3. הקש \"הוסף\"",
+        installFirefox: "ב-Firefox:\n1. הקש על תפריט שלוש הנקודות\n2. בחר \"התקן\"\n\nאו חפש את סמל ההתקנה בשורת הכתובת",
+        installGeneric: "להתקנת האפליקציה:\n\nחפש אפשרות \"התקנה\" בתפריט הדפדפן, או סמל התקנה בשורת הכתובת."
       }
     };
 
@@ -1087,11 +1099,11 @@
       const [loading, setLoading] = useState(false);
       const [error, setError] = useState(null);
       const [locationLoaded, setLocationLoaded] = useState(false);
-      const [language, setLanguage] = useState('en');
-      const [darkMode, setDarkMode] = useState(false);
+      const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
+      const [darkMode, setDarkMode] = useState(localStorage.getItem('darkMode') === 'true');
       const [menuOpen, setMenuOpen] = useState(false);
       const [showWelcome, setShowWelcome] = useState(false);
-      const [locationMode, setLocationMode] = useState('auto'); // Start with 'auto'
+      const [locationMode, setLocationMode] = useState(localStorage.getItem('locationMode') || 'auto'); // Start with 'auto'
       const [showCitySelector, setShowCitySelector] = useState(false);
       const [citySearch, setCitySearch] = useState('');
       const [selectedCity, setSelectedCity] = useState(null);
@@ -1306,7 +1318,7 @@
       const handleAddToHomeScreen = async () => {
         // For Edge and other browsers, check if already installed
         if (window.matchMedia('(display-mode: standalone)').matches) {
-          alert('App is already installed!');
+          alert(t.installAlreadyInstalled);
           setMenuOpen(false);
           return;
         }
@@ -1325,19 +1337,15 @@
         let instructions = '';
 
         if (userAgent.includes('edg')) {
-          // Microsoft Edge
-          instructions = 'In Edge:\n1. Click the three dots (...) menu\n2. Select "Apps"\n3. Click "Install WeatherFit"\n\nOr press Ctrl+Shift+A';
+          instructions = t.installEdge;
         } else if (userAgent.includes('chrome') && !userAgent.includes('edg')) {
-          // Chrome
-          instructions = 'In Chrome:\n1. Click the three dots menu\n2. Select "Install WeatherFit"\n\nOr look for the install icon (⊕) in the address bar';
+          instructions = t.installChrome;
         } else if (userAgent.includes('safari') && !userAgent.includes('chrome')) {
-          // Safari (iOS)
-          instructions = 'In Safari:\n1. Tap the Share button\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add"';
+          instructions = t.installSafari;
         } else if (userAgent.includes('firefox')) {
-          // Firefox
-          instructions = 'In Firefox:\n1. Tap the three dots menu\n2. Select "Install"\n\nOr look for the install icon in the address bar';
+          instructions = t.installFirefox;
         } else {
-          instructions = 'To install this app:\n\nLook for an "Install" option in your browser menu, or an install icon in the address bar.';
+          instructions = t.installGeneric;
         }
 
         alert(instructions);
@@ -1427,11 +1435,14 @@
       };
 
       const toggleDarkMode = () => {
-        setDarkMode(!darkMode);
+        const newDarkMode = !darkMode;
+        setDarkMode(newDarkMode);
+        localStorage.setItem('darkMode', newDarkMode);
       };
 
       const changeLanguage = (lang) => {
         setLanguage(lang);
+        localStorage.setItem('language', lang);
       };
 
       const handleWelcomeChoice = (mode) => {
@@ -1593,7 +1604,7 @@
           });
         } else if (temp < 20) {
           outfit.items.push({
-            icon: '👕',
+            icon: '👔',
             category: t.top,
             description: t.longSleeve
           });
