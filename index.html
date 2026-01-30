@@ -115,48 +115,48 @@
     }
 
     .scroll-arrow {
-      position: absolute;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 40px;
-      height: 40px;
-      background: rgba(255, 255, 255, 0.3);
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, var(--pastel-blue) 0%, var(--pastel-lavender) 100%);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      z-index: 100;
+      z-index: 1000;
       animation: bounce 2s infinite;
       transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
 
     .scroll-arrow:hover {
-      background: rgba(255, 255, 255, 0.5);
-      transform: translateX(-50%) scale(1.1);
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
     }
 
     .scroll-arrow:active {
-      transform: translateX(-50%) scale(0.95);
+      transform: scale(0.95);
     }
 
     .scroll-arrow::after {
       content: '↓';
-      font-size: 1.5rem;
+      font-size: 1.8rem;
       color: white;
       font-weight: bold;
     }
 
     @keyframes bounce {
       0%, 20%, 50%, 80%, 100% {
-        transform: translateX(-50%) translateY(0);
+        transform: translateY(0);
       }
       40% {
-        transform: translateX(-50%) translateY(-10px);
+        transform: translateY(-10px);
       }
       60% {
-        transform: translateX(-50%) translateY(-5px);
+        transform: translateY(-5px);
       }
     }
 
@@ -320,7 +320,7 @@
       box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
       transition: right 0.3s ease;
       z-index: 999;
-      padding: 80px 30px 30px;
+      padding: 60px 25px 25px;
       overflow-y: auto;
     }
 
@@ -351,15 +351,15 @@
     }
 
     .menu-section {
-      margin-bottom: 30px;
+      margin-bottom: 20px;
     }
 
     .menu-title {
       font-family: 'Comfortaa', cursive;
-      font-size: 1.1rem;
+      font-size: 0.95rem;
       font-weight: 700;
       color: var(--pastel-lavender);
-      margin-bottom: 15px;
+      margin-bottom: 10px;
       text-transform: uppercase;
       letter-spacing: 1px;
     }
@@ -368,10 +368,10 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 15px;
+      padding: 12px 15px;
       background: var(--soft-gray);
       border-radius: 15px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       cursor: pointer;
       transition: all 0.3s ease;
     }
@@ -1903,8 +1903,9 @@
             <div className="greeting">{getGreeting()}</div>
             <h1 className="logo">{t.title}</h1>
             <p className="tagline">{t.tagline}</p>
-            {weather && <div className="scroll-arrow" onClick={scrollToOutfit}></div>}
           </header>
+
+          {weather && <div className="scroll-arrow" onClick={scrollToOutfit}></div>}
 
           <div className="weather-card">
             {!locationLoaded && !error && (
