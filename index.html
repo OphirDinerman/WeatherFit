@@ -602,16 +602,16 @@
 
     .weather-info {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
       margin-bottom: 25px;
     }
 
     .info-box {
       background: linear-gradient(135deg, #FFFFFF 0%, #F8F8F8 100%);
       border: 2px solid #D0D0D0;
-      border-radius: 15px;
-      padding: 12px 8px;
+      border-radius: 20px;
+      padding: 20px 15px;
       text-align: center;
       transition: all 0.3s ease;
       box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
@@ -628,16 +628,16 @@
     }
 
     .info-label {
-      font-size: 0.65rem;
+      font-size: 0.7rem;
       font-weight: 500;
       color: #666666;
-      letter-spacing: 0.3px;
-      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
       text-transform: uppercase;
     }
 
     .info-value {
-      font-size: 1.4rem;
+      font-size: 1.8rem;
       font-weight: 700;
       background: linear-gradient(135deg, #5A8EA8, #7A6AAC);
       -webkit-background-clip: text;
@@ -997,13 +997,7 @@
         errorPermission: "Location access denied. Please enable location permissions.",
         errorUnavailable: "Location information unavailable.",
         errorTimeout: "Location request timed out.",
-        errorFetch: "Failed to fetch weather data",
-        installAlreadyInstalled: "App is already installed!",
-        installEdge: "In Edge:\n1. Click the three dots (...) menu\n2. Select \"Apps\"\n3. Click \"Install WeatherFit\"\n\nOr press Ctrl+Shift+A",
-        installChrome: "In Chrome:\n1. Click the three dots menu\n2. Select \"Install WeatherFit\"\n\nOr look for the install icon (⊕) in the address bar",
-        installSafari: "In Safari:\n1. Tap the Share button\n2. Scroll down and tap \"Add to Home Screen\"\n3. Tap \"Add\"",
-        installFirefox: "In Firefox:\n1. Tap the three dots menu\n2. Select \"Install\"\n\nOr look for the install icon in the address bar",
-        installGeneric: "To install this app:\n\nLook for an \"Install\" option in your browser menu, or an install icon in the address bar."
+        errorFetch: "Failed to fetch weather data"
       },
       he: {
         title: "WeatherFit",
@@ -1084,13 +1078,7 @@
         errorPermission: "הגישה למיקום נדחתה. אנא אפשר הרשאות מיקום.",
         errorUnavailable: "מידע מיקום לא זמין.",
         errorTimeout: "בקשת המיקום פגה.",
-        errorFetch: "נכשל בשליפת נתוני מזג אוויר",
-        installAlreadyInstalled: "האפליקציה כבר מותקנת!",
-        installEdge: "ב-Edge:\n1. לחץ על תפריט שלוש הנקודות (...)\n2. בחר \"אפליקציות\"\n3. לחץ על \"התקן WeatherFit\"\n\nאו לחץ Ctrl+Shift+A",
-        installChrome: "ב-Chrome:\n1. לחץ על תפריט שלוש הנקודות\n2. בחר \"התקן WeatherFit\"\n\nאו חפש את סמל ההתקנה (⊕) בשורת הכתובת",
-        installSafari: "ב-Safari:\n1. הקש על כפתור השיתוף\n2. גלול למטה והקש על \"הוסף למסך הבית\"\n3. הקש \"הוסף\"",
-        installFirefox: "ב-Firefox:\n1. הקש על תפריט שלוש הנקודות\n2. בחר \"התקן\"\n\nאו חפש את סמל ההתקנה בשורת הכתובת",
-        installGeneric: "להתקנת האפליקציה:\n\nחפש אפשרות \"התקנה\" בתפריט הדפדפן, או סמל התקנה בשורת הכתובת."
+        errorFetch: "נכשל בשליפת נתוני מזג אוויר"
       }
     };
 
@@ -1099,11 +1087,11 @@
       const [loading, setLoading] = useState(false);
       const [error, setError] = useState(null);
       const [locationLoaded, setLocationLoaded] = useState(false);
-      const [language, setLanguage] = useState(localStorage.getItem('language') || 'en');
-      const [darkMode, setDarkMode] = useState(localStorage.getItem('darkMode') === 'true');
+      const [language, setLanguage] = useState('en');
+      const [darkMode, setDarkMode] = useState(false);
       const [menuOpen, setMenuOpen] = useState(false);
       const [showWelcome, setShowWelcome] = useState(false);
-      const [locationMode, setLocationMode] = useState(localStorage.getItem('locationMode') || 'auto'); // Start with 'auto'
+      const [locationMode, setLocationMode] = useState('auto'); // Start with 'auto'
       const [showCitySelector, setShowCitySelector] = useState(false);
       const [citySearch, setCitySearch] = useState('');
       const [selectedCity, setSelectedCity] = useState(null);
@@ -1318,7 +1306,7 @@
       const handleAddToHomeScreen = async () => {
         // For Edge and other browsers, check if already installed
         if (window.matchMedia('(display-mode: standalone)').matches) {
-          alert(t.installAlreadyInstalled);
+          alert('App is already installed!');
           setMenuOpen(false);
           return;
         }
@@ -1337,15 +1325,19 @@
         let instructions = '';
 
         if (userAgent.includes('edg')) {
-          instructions = t.installEdge;
+          // Microsoft Edge
+          instructions = 'In Edge:\n1. Click the three dots (...) menu\n2. Select "Apps"\n3. Click "Install WeatherFit"\n\nOr press Ctrl+Shift+A';
         } else if (userAgent.includes('chrome') && !userAgent.includes('edg')) {
-          instructions = t.installChrome;
+          // Chrome
+          instructions = 'In Chrome:\n1. Click the three dots menu\n2. Select "Install WeatherFit"\n\nOr look for the install icon (⊕) in the address bar';
         } else if (userAgent.includes('safari') && !userAgent.includes('chrome')) {
-          instructions = t.installSafari;
+          // Safari (iOS)
+          instructions = 'In Safari:\n1. Tap the Share button\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add"';
         } else if (userAgent.includes('firefox')) {
-          instructions = t.installFirefox;
+          // Firefox
+          instructions = 'In Firefox:\n1. Tap the three dots menu\n2. Select "Install"\n\nOr look for the install icon in the address bar';
         } else {
-          instructions = t.installGeneric;
+          instructions = 'To install this app:\n\nLook for an "Install" option in your browser menu, or an install icon in the address bar.';
         }
 
         alert(instructions);
@@ -1435,14 +1427,11 @@
       };
 
       const toggleDarkMode = () => {
-        const newDarkMode = !darkMode;
-        setDarkMode(newDarkMode);
-        localStorage.setItem('darkMode', newDarkMode);
+        setDarkMode(!darkMode);
       };
 
       const changeLanguage = (lang) => {
         setLanguage(lang);
-        localStorage.setItem('language', lang);
       };
 
       const handleWelcomeChoice = (mode) => {
@@ -1604,7 +1593,7 @@
           });
         } else if (temp < 20) {
           outfit.items.push({
-            icon: '🧶',
+            icon: '👕',
             category: t.top,
             description: t.longSleeve
           });
