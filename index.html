@@ -1,0 +1,2019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#A8D8EA">
+  <meta name="description" content="Smart weather-based outfit recommendations">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="WeatherFit">
+  <title>WeatherFit - Smart Outfit Recommendations</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Comfortaa:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --pastel-blue: #A8D8EA;
+      --pastel-pink: #FFB6C1;
+      --pastel-lavender: #DCD0FF;
+      --pastel-mint: #B5EAD7;
+      --pastel-peach: #FFDAB9;
+      --pastel-yellow: #FFF9A6;
+      --white: #FFFFFF;
+      --soft-gray: #F5F5F5;
+      --text-dark: #1A1A1A;
+      --text-light: #4A4A4A;
+      --bg-gradient-1: #F5F5F5;
+      --bg-gradient-2: #E8F4F8;
+      --bg-gradient-3: #F0F0F5;
+    }
+
+    [data-theme="dark"] {
+      --pastel-blue: #5A8EA8;
+      --pastel-pink: #B87A8A;
+      --pastel-lavender: #9A88C0;
+      --pastel-mint: #7AA897;
+      --pastel-peach: #C9A889;
+      --pastel-yellow: #C9C976;
+      --white: #2A2A2E;
+      --soft-gray: #3A3A3E;
+      --text-dark: #E0E0E0;
+      --text-light: #B0B0B0;
+      --bg-gradient-1: #1A1A1E;
+      --bg-gradient-2: #252530;
+      --bg-gradient-3: #2A2A35;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 50%, var(--bg-gradient-3) 100%);
+      color: var(--text-dark);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: 
+        radial-gradient(circle at 20% 30%, rgba(168, 216, 234, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255, 182, 193, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(220, 208, 255, 0.15) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .app-container {
+      position: relative;
+      z-index: 2;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 0;
+      min-height: 100vh;
+      background: var(--white);
+      box-shadow: 0 0 50px rgba(0, 0, 0, 0.08);
+    }
+
+    .header {
+      text-align: center;
+      padding: 40px 20px 30px;
+      background: linear-gradient(135deg, var(--pastel-blue) 0%, var(--pastel-lavender) 100%);
+      border-radius: 0 0 30px 30px;
+      animation: slideDown 0.6s ease-out;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header.sunny {
+      background: linear-gradient(135deg, #FFD93D 0%, #FFA500 100%);
+    }
+
+    .header.rainy {
+      background: linear-gradient(135deg, #6B9AC4 0%, #4A7BA7 100%);
+    }
+
+    .header.cloudy {
+      background: linear-gradient(135deg, #B0C4DE 0%, #9AADCA 100%);
+    }
+
+    .weather-animation {
+      position: absolute;
+      top: 15px;
+      left: 20px;
+      font-size: 2.8rem;
+      animation: float 3s ease-in-out infinite;
+      z-index: 50;
+    }
+
+    .greeting {
+      font-family: 'Comfortaa', cursive;
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 1);
+      margin-bottom: 15px;
+      font-weight: 600;
+      text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .logo {
+      font-family: 'Comfortaa', cursive;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .tagline {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 400;
+      letter-spacing: 2px;
+    }
+
+    .weather-card {
+      padding: 25px 20px;
+      animation: fadeInUp 0.5s ease-out 0.1s both;
+    }
+
+    .weather-tip {
+      background: linear-gradient(135deg, #FFF9E6 0%, #FFF0F0 100%);
+      border-left: 4px solid #FFA500;
+      border-radius: 15px;
+      padding: 15px 18px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    [data-theme="dark"] .weather-tip {
+      background: linear-gradient(135deg, #3A3A2E 0%, #3A2E2E 100%);
+      border-left-color: #FFB84D;
+    }
+
+    .weather-tip-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .weather-tip-text {
+      color: #2A2A2A;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      font-weight: 600;
+    }
+
+    [data-theme="dark"] .weather-tip-text {
+      color: #E8E8E8;
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--pastel-pink) 0%, var(--pastel-peach) 100%);
+      border: none;
+      border-radius: 25px;
+      color: var(--white);
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 182, 193, 0.3);
+      margin-bottom: 20px;
+    }
+
+    button:active {
+      transform: scale(0.98);
+      box-shadow: 0 2px 10px rgba(255, 182, 193, 0.4);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .menu-button {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(255, 255, 255, 0.3);
+      border: none;
+      border-radius: 12px;
+      padding: 12px;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      width: auto;
+      margin: 0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+    }
+
+    [data-theme="dark"] .menu-button {
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .menu-button:active {
+      transform: scale(0.95);
+    }
+
+    .hamburger {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .hamburger span {
+      width: 24px;
+      height: 3px;
+      background: var(--pastel-lavender);
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .menu-button.active .hamburger span:nth-child(1) {
+      transform: rotate(45deg) translate(7px, 7px);
+    }
+
+    .menu-button.active .hamburger span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .menu-button.active .hamburger span:nth-child(3) {
+      transform: rotate(-45deg) translate(7px, -7px);
+    }
+
+    .side-menu {
+      position: fixed;
+      top: 0;
+      right: -300px;
+      width: 300px;
+      height: 100vh;
+      background: var(--white);
+      box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+      transition: right 0.3s ease;
+      z-index: 999;
+      padding: 80px 30px 30px;
+      overflow-y: auto;
+    }
+
+    [data-theme="dark"] .side-menu {
+      box-shadow: -4px 0 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .side-menu.open {
+      right: 0;
+    }
+
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 998;
+    }
+
+    .menu-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .menu-section {
+      margin-bottom: 30px;
+    }
+
+    .menu-title {
+      font-family: 'Comfortaa', cursive;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--pastel-lavender);
+      margin-bottom: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .menu-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px;
+      background: var(--soft-gray);
+      border-radius: 15px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .menu-option:active {
+      transform: scale(0.98);
+    }
+
+    .menu-option-label {
+      font-size: 1rem;
+      color: var(--text-dark);
+      font-weight: 500;
+    }
+
+    .menu-option-value {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      font-weight: 600;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 50px;
+      height: 26px;
+      background: var(--soft-gray);
+      border-radius: 13px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      border: 2px solid var(--pastel-lavender);
+    }
+
+    .toggle-switch.active {
+      background: var(--pastel-lavender);
+    }
+
+    .toggle-slider {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 18px;
+      height: 18px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .toggle-switch.active .toggle-slider {
+      transform: translateX(24px);
+    }
+
+    .app-direction-rtl {
+      direction: rtl;
+    }
+
+    .welcome-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: linear-gradient(135deg, var(--pastel-blue) 0%, var(--pastel-lavender) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 20px;
+    }
+
+    .welcome-content {
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .welcome-title {
+      font-family: 'Comfortaa', cursive;
+      font-size: 2rem;
+      color: white;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .welcome-subtitle {
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 40px;
+    }
+
+    .welcome-options {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .welcome-option {
+      background: white;
+      border-radius: 20px;
+      padding: 25px 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .welcome-option:active {
+      transform: scale(0.98);
+    }
+
+    .welcome-option-icon {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    .welcome-option-title {
+      font-family: 'Comfortaa', cursive;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--pastel-lavender);
+      margin-bottom: 5px;
+    }
+
+    .welcome-option-desc {
+      font-size: 0.9rem;
+      color: var(--text-light);
+    }
+
+    .city-selector {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: var(--white);
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .city-selector-header {
+      background: linear-gradient(135deg, var(--pastel-blue) 0%, var(--pastel-lavender) 100%);
+      padding: 40px 20px 30px;
+      text-align: center;
+    }
+
+    .city-selector-title {
+      font-family: 'Comfortaa', cursive;
+      font-size: 1.5rem;
+      color: white;
+      margin-bottom: 20px;
+    }
+
+    .city-search {
+      width: 100%;
+      padding: 15px 20px;
+      border: none;
+      border-radius: 15px;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 1rem;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--text-dark);
+    }
+
+    .city-search::placeholder {
+      color: var(--text-light);
+    }
+
+    .city-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+    }
+
+    .city-item {
+      padding: 18px 20px;
+      background: var(--soft-gray);
+      border-radius: 15px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .city-item:active {
+      transform: scale(0.98);
+      background: var(--pastel-blue);
+    }
+
+    .city-item-icon {
+      font-size: 1.5rem;
+    }
+
+    .city-item-text {
+      flex: 1;
+    }
+
+    .city-item-name {
+      font-weight: 600;
+      color: var(--text-dark);
+      font-size: 1rem;
+    }
+
+    .city-item-country {
+      font-size: 0.85rem;
+      color: var(--text-light);
+    }
+
+    .about-popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+      padding: 20px;
+    }
+
+    .about-content {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 30px 25px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      animation: fadeInUp 0.3s ease-out;
+    }
+
+    .about-title {
+      font-family: 'Comfortaa', cursive;
+      font-size: 1.5rem;
+      color: var(--pastel-lavender);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .about-text {
+      color: var(--text-dark);
+      line-height: 1.6;
+      font-size: 0.95rem;
+      margin-bottom: 25px;
+      text-align: center;
+    }
+
+    .about-developer {
+      color: var(--text-light);
+      font-size: 0.9rem;
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .close-button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--pastel-lavender) 0%, var(--pastel-blue) 100%);
+      border: none;
+      border-radius: 15px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 0;
+    }
+
+    .close-button:active {
+      transform: scale(0.98);
+    }
+
+    .weather-info {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+
+    .info-box {
+      background: linear-gradient(135deg, #FFFFFF 0%, #F8F8F8 100%);
+      border: 2px solid #D0D0D0;
+      border-radius: 20px;
+      padding: 20px 15px;
+      text-align: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    [data-theme="dark"] .info-box {
+      background: linear-gradient(135deg, var(--white) 0%, var(--soft-gray) 100%);
+      border: none;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .info-box:active {
+      transform: scale(0.97);
+    }
+
+    .info-label {
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #666666;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .info-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #5A8EA8, #7A6AAC);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-family: 'Comfortaa', cursive;
+    }
+
+    .outfit-card {
+      background: var(--white);
+      border-radius: 25px;
+      padding: 25px 20px;
+      margin: 0 20px 25px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      animation: fadeInUp 0.5s ease-out 0.3s both;
+    }
+
+    .outfit-title {
+      font-family: 'Comfortaa', cursive;
+      font-size: 1.4rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--pastel-pink), var(--pastel-lavender));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .outfit-items {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .outfit-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 16px;
+      background: linear-gradient(135deg, #FFFAF0 0%, #FFF5F8 100%);
+      border-radius: 18px;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    [data-theme="dark"] .outfit-item {
+      background: linear-gradient(135deg, rgba(58, 58, 62, 0.6) 0%, rgba(58, 58, 62, 0.8) 100%);
+    }
+
+    .outfit-item:active {
+      transform: scale(0.98);
+    }
+
+    .outfit-icon {
+      font-size: 2.2rem;
+      min-width: 50px;
+      text-align: center;
+    }
+
+    .outfit-text {
+      flex: 1;
+    }
+
+    .outfit-category {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #C85A7A;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    [data-theme="dark"] .outfit-category {
+      color: #FFB6C1;
+    }
+
+    .outfit-description {
+      color: #1A1A1A;
+      line-height: 1.5;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    [data-theme="dark"] .outfit-description {
+      color: #F0F0F0;
+      font-weight: 500;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px 20px;
+      font-size: 1.1rem;
+      color: var(--pastel-lavender);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    .error {
+      background: linear-gradient(135deg, #FFE5E5 0%, #FFF0F0 100%);
+      border-radius: 20px;
+      padding: 25px;
+      color: #FF6B6B;
+      text-align: center;
+      margin: 0 20px;
+      box-shadow: 0 2px 15px rgba(255, 107, 107, 0.1);
+    }
+
+    .advice-section {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 2px dashed var(--soft-gray);
+    }
+
+    .advice-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #5A8EA8;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    [data-theme="dark"] .advice-title {
+      color: #88B8D8;
+    }
+
+    .advice-text {
+      color: #1A1A1A;
+      line-height: 1.6;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    [data-theme="dark"] .advice-text {
+      color: #F0F0F0;
+      font-weight: 500;
+    }
+
+    .location-detect {
+      text-align: center;
+      padding: 30px 20px;
+    }
+
+    .location-detect-icon {
+      font-size: 3.5rem;
+      margin-bottom: 15px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .location-detect h3 {
+      font-family: 'Comfortaa', cursive;
+      color: var(--pastel-lavender);
+      margin-bottom: 10px;
+      font-size: 1.2rem;
+    }
+
+    .location-detect p {
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+
+    h2.location-title {
+      font-family: 'Comfortaa', cursive;
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+      color: var(--pastel-lavender);
+      text-align: center;
+    }
+
+    .last-updated {
+      font-size: 0.75rem;
+      color: #888888;
+      text-align: center;
+      margin-bottom: 15px;
+      font-weight: 500;
+    }
+
+    [data-theme="dark"] .last-updated {
+      color: #A0A0A0;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.6;
+      }
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root">
+    <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #A8D8EA 0%, #DCD0FF 100%); font-family: Arial, sans-serif;">
+      <div style="text-align: center; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+        <h2 style="color: #A8D8EA; margin-bottom: 20px;">🌤️ WeatherFit</h2>
+        <p style="color: #666;">Loading app...</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // Error boundary wrapper
+    class ErrorBoundary extends React.Component {
+      constructor(props) {
+        super(props);
+        this.state = { hasError: false, error: null };
+      }
+
+      static getDerivedStateFromError(error) {
+        return { hasError: true, error };
+      }
+
+      componentDidCatch(error, errorInfo) {
+        console.error('App Error:', error, errorInfo);
+      }
+
+      render() {
+        if (this.state.hasError) {
+          return (
+            <div style={{
+              padding: '40px',
+              textAlign: 'center',
+              fontFamily: 'Quicksand, sans-serif'
+            }}>
+              <h1>⚠️ Something went wrong</h1>
+              <p>Please refresh the page to try again.</p>
+              <button onClick={() => window.location.reload()} 
+                      style={{
+                        padding: '12px 24px',
+                        background: '#A8D8EA',
+                        border: 'none',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        marginTop: '20px'
+                      }}>
+                Refresh Page
+              </button>
+            </div>
+          );
+        }
+        return this.props.children;
+      }
+    }
+
+    // Translation object
+    const translations = {
+      en: {
+        title: "WeatherFit",
+        tagline: "Your Daily Outfit Guide",
+        detecting: "Detecting Your Location...",
+        allowAccess: "Please allow location access in your browser",
+        tryAgain: "Try Again",
+        scanning: "Analyzing weather patterns...",
+        temperature: "Temperature",
+        humidity: "Humidity",
+        windSpeed: "Wind Speed",
+        rainChance: "Rain Chance",
+        yourOutfit: "👔 Your Outfit",
+        advice: "💡 Advice",
+        menuSettings: "Settings",
+        menuLanguage: "Language",
+        menuDarkMode: "Dark Mode",
+        menuLocationMode: "Location Mode",
+        menuAddToHome: "Add to Home Screen",
+        menuRefreshWeather: "Refresh Weather",
+        menuAbout: "About",
+        aboutTitle: "About WeatherFit",
+        aboutText: "WeatherFit is your smart weather companion that helps you dress perfectly for any weather condition. Get personalized outfit recommendations based on real-time weather data from Open-Meteo API. Our recommendations analyze temperature, humidity, wind speed, and rain probability to suggest the best clothing choices for your day.",
+        aboutDeveloper: "Developed by Ophir Dinerman",
+        close: "Close",
+        languageEnglish: "English",
+        languageHebrew: "Hebrew",
+        locationAutomatic: "Automatic",
+        locationManual: "Manual",
+        updatedJustNow: "Updated just now",
+        updatedMinutesAgo: "Updated {minutes} min ago",
+        updatedHoursAgo: "Updated {hours}h ago",
+        goodMorning: "Good Morning",
+        goodAfternoon: "Good Afternoon",
+        goodEvening: "Good Evening",
+        goodNight: "Good Night",
+        welcomeTitle: "Welcome to WeatherFit!",
+        welcomeSubtitle: "How would you like to set your location?",
+        welcomeAutomatic: "Automatic Location",
+        welcomeAutomaticDesc: "Use your phone's GPS",
+        welcomeManual: "Choose Manually",
+        welcomeManualDesc: "Select from a list of cities",
+        selectCity: "Select Your City",
+        searchCity: "Search city...",
+        changeLocation: "📍 Change Location",
+        outerLayer: "Outer Layer",
+        accessories: "Accessories",
+        top: "Top",
+        bottoms: "Bottoms",
+        footwear: "Footwear",
+        rainGear: "Rain Gear",
+        windProtection: "Wind Protection",
+        sunProtection: "Sun Protection",
+        heavyCoat: "Heavy winter coat or parka - it's freezing out there!",
+        warmAccessories: "Scarf, warm hat, and insulated gloves",
+        warmJacket: "Warm jacket or heavy coat",
+        lightGloves: "Light gloves and a hat recommended",
+        lightJacket: "Light jacket or sweater",
+        longSleeve: "Long sleeve shirt or light sweater",
+        shortSleeve: "Short sleeve shirt or t-shirt",
+        lightClothing: "Light, breathable clothing - it's hot!",
+        warmPants: "Warm pants or jeans with thermal underwear",
+        jeans: "Jeans or long pants",
+        shorts: "Shorts or light pants",
+        waterproofBoots: "Waterproof boots or shoes",
+        closedShoes: "Closed-toe shoes or boots",
+        sneakers: "Comfortable sneakers or casual shoes",
+        umbrella: "Umbrella or waterproof jacket essential",
+        windbreaker: "Windbreaker recommended - it's quite breezy",
+        sunglasses: "Sunglasses and sunscreen recommended",
+        adviceExtremeCold: "Bundle up! Layer your clothing and limit time outdoors. Extreme cold can be dangerous.",
+        adviceCold: "Layer your clothing for warmth. You can always remove layers if you get too warm.",
+        adviceHot: "Stay hydrated! Wear light colors and breathable fabrics. Avoid prolonged sun exposure.",
+        adviceRain: "Bring rain protection and wear water-resistant footwear to stay dry.",
+        adviceHumidity: "High humidity - choose breathable, moisture-wicking fabrics for comfort.",
+        advicePerfect: "Perfect weather! Dress comfortably and enjoy your day.",
+        errorLocation: "Unable to get your location",
+        errorPermission: "Location access denied. Please enable location permissions.",
+        errorUnavailable: "Location information unavailable.",
+        errorTimeout: "Location request timed out.",
+        errorFetch: "Failed to fetch weather data"
+      },
+      he: {
+        title: "WeatherFit",
+        tagline: "מדריך הלבוש היומי שלך",
+        detecting: "מזהה את המיקום שלך...",
+        allowAccess: "אנא אפשר גישה למיקום בדפדפן",
+        tryAgain: "נסה שוב",
+        scanning: "מנתח נתוני מזג אויר...",
+        temperature: "טמפרטורה",
+        humidity: "לחות",
+        windSpeed: "מהירות רוח",
+        rainChance: "סיכוי לגשם",
+        yourOutfit: "👔 הלבוש שלך",
+        advice: "💡 עצה",
+        menuSettings: "הגדרות",
+        menuLanguage: "שפה",
+        menuDarkMode: "מצב כהה",
+        menuLocationMode: "מצב מיקום",
+        menuAddToHome: "הוסף למסך הבית",
+        menuRefreshWeather: "רענן מזג אוויר",
+        menuAbout: "אודות",
+        aboutTitle: "אודות WeatherFit",
+        aboutText: "WeatherFit הוא היועץ החכם שלך למזג האוויר שעוזר לך להתלבש בצורה מושלמת לכל מזג אוויר. קבל המלצות לבוש מותאמות אישית המבוססות על נתוני מזג אוויר בזמן אמת מ-Open-Meteo API. ההמלצות שלנו מנתחות טמפרטורה, לחות, מהירות רוח וסבירות לגשם כדי להציע את בחירות הלבוש הטובות ביותר ליום שלך.",
+        aboutDeveloper: "פותח על ידי אופיר דינרמן",
+        close: "סגור",
+        languageEnglish: "אנגלית",
+        languageHebrew: "עברית",
+        locationAutomatic: "אוטומטי",
+        locationManual: "ידני",
+        updatedJustNow: "עודכן כרגע",
+        updatedMinutesAgo: "עודכן לפני {minutes} דק'",
+        updatedHoursAgo: "עודכן לפני {hours} שעות",
+        goodMorning: "בוקר טוב",
+        goodAfternoon: "צהריים טובים",
+        goodEvening: "ערב טוב",
+        goodNight: "לילה טוב",
+        welcomeTitle: "!ברוך הבא ל-WeatherFit",
+        welcomeSubtitle: "איך תרצה להגדיר את המיקום?",
+        welcomeAutomatic: "מיקום אוטומטי",
+        welcomeAutomaticDesc: "השתמש ב-GPS של הטלפון",
+        welcomeManual: "בחר ידנית",
+        welcomeManualDesc: "בחר מרשימת ערים",
+        selectCity: "בחר את העיר שלך",
+        searchCity: "חפש עיר...",
+        changeLocation: "📍 שנה מיקום",
+        outerLayer: "שכבה חיצונית",
+        accessories: "אביזרים",
+        top: "חולצה",
+        bottoms: "מכנסיים",
+        footwear: "נעליים",
+        rainGear: "ציוד גשם",
+        windProtection: "הגנה מרוח",
+        sunProtection: "הגנה מהשמש",
+        heavyCoat: "מעיל חורף כבד או פארקה - קר מאוד בחוץ!",
+        warmAccessories: "צעיף, כובע חם וכפפות מבודדות",
+        warmJacket: "ג'קט חם או מעיל כבד",
+        lightGloves: "כפפות קלות וכובע מומלצים",
+        lightJacket: "ג'קט קל או סוודר",
+        longSleeve: "חולצה עם שרוולים ארוכים או סוודר קל",
+        shortSleeve: "חולצת טי או חולצה עם שרוולים קצרים",
+        lightClothing: "בגדים קלים ונושמים - חם בחוץ!",
+        warmPants: "מכנסיים חמים או ג'ינס עם תחתונים תרמיים",
+        jeans: "ג'ינס או מכנסיים ארוכים",
+        shorts: "מכנסיים קצרים או מכנסיים קלים",
+        waterproofBoots: "מגפיים או נעליים עמידות במים",
+        closedShoes: "נעליים סגורות או מגפיים",
+        sneakers: "נעלי ספורט נוחות או נעליים קז'ואל",
+        umbrella: "מטריה או ג'קט עמיד במים חיוני",
+        windbreaker: "ג'קט רוח מומלץ - רוח חזקה",
+        sunglasses: "משקפי שמש וקרם הגנה מומלצים",
+        adviceExtremeCold: "התלבש בשכבות! הגבל זמן בחוץ. קור קיצוני יכול להיות מסוכן.",
+        adviceCold: "התלבש בשכבות לחום. תמיד אפשר להסיר שכבות אם נעשה חם מדי.",
+        adviceHot: "שתה הרבה! לבש צבעים בהירים ובדים נושמים. הימנע מחשיפה ממושכת לשמש.",
+        adviceRain: "קח הגנה מגשם ולבש נעליים עמידות במים כדי להישאר יבש.",
+        adviceHumidity: "לחות גבוהה - בחר בדים נושמים שמסלקים לחות לנוחות.",
+        advicePerfect: "מזג אוויר מושלם! התלבש בנוחות ותהנה מהיום.",
+        errorLocation: "לא ניתן לקבל את המיקום שלך",
+        errorPermission: "הגישה למיקום נדחתה. אנא אפשר הרשאות מיקום.",
+        errorUnavailable: "מידע מיקום לא זמין.",
+        errorTimeout: "בקשת המיקום פגה.",
+        errorFetch: "נכשל בשליפת נתוני מזג אוויר"
+      }
+    };
+
+    function WeatherOutfitApp() {
+      const [weather, setWeather] = useState(null);
+      const [loading, setLoading] = useState(false);
+      const [error, setError] = useState(null);
+      const [locationLoaded, setLocationLoaded] = useState(false);
+      const [language, setLanguage] = useState('en');
+      const [darkMode, setDarkMode] = useState(false);
+      const [menuOpen, setMenuOpen] = useState(false);
+      const [showWelcome, setShowWelcome] = useState(true);
+      const [locationMode, setLocationMode] = useState(null); // 'auto' or 'manual'
+      const [showCitySelector, setShowCitySelector] = useState(false);
+      const [citySearch, setCitySearch] = useState('');
+      const [selectedCity, setSelectedCity] = useState(null);
+      const [deferredPrompt, setDeferredPrompt] = useState(null);
+      const [lastUpdated, setLastUpdated] = useState(null);
+      const [showAbout, setShowAbout] = useState(false);
+
+      const t = translations[language];
+
+      // Get time ago string
+      const getTimeAgo = () => {
+        if (!lastUpdated) return '';
+        const now = new Date();
+        const diff = Math.floor((now - lastUpdated) / 1000 / 60); // minutes
+        
+        if (diff < 1) return t.updatedJustNow;
+        if (diff < 60) return t.updatedMinutesAgo.replace('{minutes}', diff);
+        const hours = Math.floor(diff / 60);
+        return t.updatedHoursAgo.replace('{hours}', hours);
+      };
+
+      // Get greeting based on time of day
+      const getGreeting = () => {
+        const hour = new Date().getHours();
+        if (hour >= 5 && hour < 12) return t.goodMorning;
+        if (hour >= 12 && hour < 17) return t.goodAfternoon;
+        if (hour >= 17 && hour < 21) return t.goodEvening;
+        return t.goodNight;
+      };
+
+      // Get weather theme based on weather code
+      const getWeatherTheme = () => {
+        if (!weather) return '';
+        const code = weather.weatherCode;
+        // Clear sky
+        if (code === 0 || code === 1) return 'sunny';
+        // Rain
+        if (code >= 51 && code <= 67) return 'rainy';
+        if (code >= 80 && code <= 82) return 'rainy';
+        // Cloudy
+        if (code === 2 || code === 3) return 'cloudy';
+        return '';
+      };
+
+      // Get weather icon based on weather code
+      const getWeatherIcon = () => {
+        if (!weather) return '☀️';
+        const code = weather.weatherCode;
+        if (code === 0 || code === 1) return '☀️';
+        if (code === 2) return '⛅';
+        if (code === 3) return '☁️';
+        if (code >= 51 && code <= 67) return '🌧️';
+        if (code >= 71 && code <= 77) return '❄️';
+        if (code >= 80 && code <= 82) return '⛈️';
+        if (code >= 95 && code <= 99) return '⛈️';
+        return '🌤️';
+      };
+
+      // Get smart weather tip based on conditions
+      const getWeatherTip = () => {
+        if (!weather) return null;
+
+        const { temperature, tempMax, tempMin, rainChance, humidity, windSpeed, weatherCode, feelsLike } = weather;
+        const tempDiff = tempMax - tempMin;
+        const currentHour = new Date().getHours();
+        const isMorning = currentHour >= 5 && currentHour < 12;
+        const isAfternoon = currentHour >= 12 && currentHour < 17;
+        const isEvening = currentHour >= 17 && currentHour < 21;
+        
+        let tip = { icon: '💡', text: '' };
+
+        // Get weather condition description
+        const getWeatherDesc = () => {
+          if (weatherCode === 0 || weatherCode === 1) return language === 'en' ? 'sunny' : 'שמשי';
+          if (weatherCode === 2) return language === 'en' ? 'partly cloudy' : 'מעונן חלקית';
+          if (weatherCode === 3) return language === 'en' ? 'cloudy' : 'מעונן';
+          if (weatherCode >= 51 && weatherCode <= 67) return language === 'en' ? 'rainy' : 'גשום';
+          if (weatherCode >= 71 && weatherCode <= 77) return language === 'en' ? 'snowy' : 'מושלג';
+          if (weatherCode >= 80 && weatherCode <= 99) return language === 'en' ? 'stormy' : 'סוער';
+          return language === 'en' ? 'clear' : 'בהיר';
+        };
+
+        const weatherDesc = getWeatherDesc();
+
+        // Priority 1: High rain chance
+        if (rainChance > 60) {
+          tip.icon = '☔';
+          tip.text = language === 'en' 
+            ? `It's going to rain today. Don't forget your umbrella!`
+            : `הולך לרדת גשם היום. אל תשכח מטריה!`;
+          return tip;
+        }
+
+        // Priority 2: Significant temperature drop in evening
+        if (isMorning && tempMin < 15 && tempDiff >= 10) {
+          tip.icon = '🧥';
+          tip.text = language === 'en'
+            ? `It's ${weatherDesc} now, but it will get cold in the evening. Bring a jacket!`
+            : `זה ${weatherDesc} עכשיו, אבל יהיה קר בערב. קח ג'קט!`;
+          return tip;
+        }
+
+        // Priority 3: Temperature will rise significantly
+        if (isMorning && tempMax > temperature + 10 && tempMax > 25) {
+          tip.icon = '🌡️';
+          tip.text = language === 'en'
+            ? `Starting ${weatherDesc}, but it will get hot later. Dress in removable layers.`
+            : `מתחיל ${weatherDesc}, אבל יהיה חם יותר מאוחר. התלבש בשכבות שאפשר להסיר.`;
+          return tip;
+        }
+
+        // Priority 4: Afternoon and will get cold
+        if (isAfternoon && tempMin < temperature - 8 && tempMin < 15) {
+          tip.icon = '🧥';
+          tip.text = language === 'en'
+            ? `Enjoy the ${weatherDesc} weather, but bring a jacket - it'll get cold tonight.`
+            : `תהנה ממזג האוויר ה${weatherDesc}, אבל קח ג'קט - יהיה קר בלילה.`;
+          return tip;
+        }
+
+        // Priority 5: Rain + cold combo
+        if (rainChance > 30 && tempMin < 15) {
+          tip.icon = '🌂';
+          tip.text = language === 'en'
+            ? `${weatherDesc} with possible rain and cold weather. Bring an umbrella and a warm jacket.`
+            : `${weatherDesc} עם אפשרות לגשם ומזג אוויר קר. קח מטריה וג'קט חם.`;
+          return tip;
+        }
+
+        // Priority 6: Very hot day
+        if (tempMax > 30) {
+          tip.icon = '🥵';
+          tip.text = language === 'en'
+            ? `Hot and ${weatherDesc} today! Stay hydrated, wear sunscreen, and bring a hat.`
+            : `חם ו${weatherDesc} היום! שתה הרבה מים, שים קרם הגנה ולבש כובע.`;
+          return tip;
+        }
+
+        // Priority 7: Cold day
+        if (tempMax < 10) {
+          tip.icon = '❄️';
+          tip.text = language === 'en'
+            ? `Cold and ${weatherDesc} today. Dress warmly in layers!`
+            : `קר ו${weatherDesc} היום. התלבש בשכבות חמות!`;
+          return tip;
+        }
+
+        // Priority 8: Sunny + warm combo
+        if ((weatherCode === 0 || weatherCode === 1) && tempMax > 25) {
+          tip.icon = '😎';
+          tip.text = language === 'en'
+            ? `Beautiful sunny day ahead! Don't forget sunglasses and sunscreen.`
+            : `יום שמשי ויפה לפנינו! אל תשכח משקפי שמש וקרם הגנה.`;
+          return tip;
+        }
+
+        // Priority 9: Very windy
+        if (windSpeed > 25) {
+          tip.icon = '💨';
+          tip.text = language === 'en'
+            ? `Very windy and ${weatherDesc} today. Wear a windbreaker and secure loose items.`
+            : `רוח חזקה מאוד ו${weatherDesc} היום. לבש ג'קט רוח ואבטח פריטים רופפים.`;
+          return tip;
+        }
+
+        // Priority 10: High humidity + heat
+        if (humidity > 75 && temperature > 22) {
+          tip.icon = '💧';
+          tip.text = language === 'en'
+            ? `Humid and ${weatherDesc}. Wear light, breathable fabrics for comfort.`
+            : `לח ו${weatherDesc}. לבש בדים קלים ונושמים לנוחות.`;
+          return tip;
+        }
+
+        // Priority 11: Moderate rain possibility
+        if (rainChance > 30) {
+          tip.icon = '🌂';
+          tip.text = language === 'en'
+            ? `${weatherDesc} with a chance of rain. Better bring an umbrella just in case.`
+            : `${weatherDesc} עם סיכוי לגשם. עדיף לקחת מטריה למקרה.`;
+          return tip;
+        }
+
+        // Priority 12: Cloudy day
+        if (weatherCode === 3) {
+          tip.icon = '☁️';
+          tip.text = language === 'en'
+            ? `Cloudy and comfortable today. Perfect weather for outdoor activities!`
+            : `מעונן ונעים היום. מזג אוויר מושלם לפעילויות בחוץ!`;
+          return tip;
+        }
+
+        // Default: Pleasant weather
+        tip.icon = '✨';
+        tip.text = language === 'en'
+          ? `Perfect ${weatherDesc} weather today! Great day to be outside.`
+          : `מזג אוויר ${weatherDesc} מושלם היום! יום נהדר לצאת החוצה.`;
+        
+        return tip;
+      };
+
+      // Handle install prompt
+      useEffect(() => {
+        const handler = (e) => {
+          e.preventDefault();
+          setDeferredPrompt(e);
+        };
+        window.addEventListener('beforeinstallprompt', handler);
+        return () => window.removeEventListener('beforeinstallprompt', handler);
+      }, []);
+
+      const handleAddToHomeScreen = async () => {
+        // For Edge and other browsers, check if already installed
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+          alert('App is already installed!');
+          setMenuOpen(false);
+          return;
+        }
+
+        // Try PWA install prompt
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+          setDeferredPrompt(null);
+          setMenuOpen(false);
+          return;
+        }
+
+        // Fallback instructions for browsers without install prompt
+        const userAgent = navigator.userAgent.toLowerCase();
+        let instructions = '';
+
+        if (userAgent.includes('edg')) {
+          // Microsoft Edge
+          instructions = 'In Edge:\n1. Click the three dots (...) menu\n2. Select "Apps"\n3. Click "Install WeatherFit"\n\nOr press Ctrl+Shift+A';
+        } else if (userAgent.includes('chrome') && !userAgent.includes('edg')) {
+          // Chrome
+          instructions = 'In Chrome:\n1. Click the three dots menu\n2. Select "Install WeatherFit"\n\nOr look for the install icon (⊕) in the address bar';
+        } else if (userAgent.includes('safari') && !userAgent.includes('chrome')) {
+          // Safari (iOS)
+          instructions = 'In Safari:\n1. Tap the Share button\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add"';
+        } else if (userAgent.includes('firefox')) {
+          // Firefox
+          instructions = 'In Firefox:\n1. Tap the three dots menu\n2. Select "Install"\n\nOr look for the install icon in the address bar';
+        } else {
+          instructions = 'To install this app:\n\nLook for an "Install" option in your browser menu, or an install icon in the address bar.';
+        }
+
+        alert(instructions);
+        setMenuOpen(false);
+      };
+
+      // Popular cities list that work well with the API
+      const popularCities = [
+        { name: "Tel Aviv", country: "Israel", lat: 32.0853, lon: 34.7818 },
+        { name: "Jerusalem", country: "Israel", lat: 31.7683, lon: 35.2137 },
+        { name: "Haifa", country: "Israel", lat: 32.7940, lon: 34.9896 },
+        { name: "Rehovot", country: "Israel", lat: 31.8914, lon: 34.8078 },
+        { name: "Or Akiva", country: "Israel", lat: 32.5094, lon: 34.9214 },
+        { name: "Netanya", country: "Israel", lat: 32.3215, lon: 34.8532 },
+        { name: "Beer Sheva", country: "Israel", lat: 31.2518, lon: 34.7913 },
+        { name: "Eilat", country: "Israel", lat: 29.5577, lon: 34.9519 },
+        { name: "New York", country: "USA", lat: 40.7128, lon: -74.0060 },
+        { name: "London", country: "UK", lat: 51.5074, lon: -0.1278 },
+        { name: "Paris", country: "France", lat: 48.8566, lon: 2.3522 },
+        { name: "Tokyo", country: "Japan", lat: 35.6762, lon: 139.6503 },
+        { name: "Dubai", country: "UAE", lat: 25.2048, lon: 55.2708 },
+        { name: "Sydney", country: "Australia", lat: -33.8688, lon: 151.2093 },
+        { name: "Los Angeles", country: "USA", lat: 34.0522, lon: -118.2437 },
+        { name: "Berlin", country: "Germany", lat: 52.5200, lon: 13.4050 },
+        { name: "Barcelona", country: "Spain", lat: 41.3851, lon: 2.1734 },
+        { name: "Rome", country: "Italy", lat: 41.9028, lon: 12.4964 },
+        { name: "Singapore", country: "Singapore", lat: 1.3521, lon: 103.8198 },
+        { name: "Hong Kong", country: "China", lat: 22.3193, lon: 114.1694 }
+      ];
+
+      const filteredCities = popularCities.filter(city =>
+        city.name.toLowerCase().includes(citySearch.toLowerCase()) ||
+        city.country.toLowerCase().includes(citySearch.toLowerCase())
+      );
+
+      // Apply dark mode to document
+      useEffect(() => {
+        if (darkMode) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.removeAttribute('data-theme');
+        }
+      }, [darkMode]);
+
+      // Check if user has previously set a location mode
+      useEffect(() => {
+        const savedMode = localStorage.getItem('locationMode');
+        const savedCity = localStorage.getItem('selectedCity');
+        
+        if (savedMode) {
+          setLocationMode(savedMode);
+          setShowWelcome(false);
+          
+          if (savedMode === 'manual' && savedCity) {
+            const city = JSON.parse(savedCity);
+            setSelectedCity(city);
+            getWeatherByCoords(city.lat, city.lon);
+            setLocationLoaded(true);
+          } else if (savedMode === 'auto') {
+            getUserLocation();
+          }
+        }
+      }, []);
+
+      // Auto-refresh weather when user returns to the app
+      useEffect(() => {
+        const handleVisibilityChange = () => {
+          if (!document.hidden && locationLoaded) {
+            // Refresh weather when user comes back to the app
+            if (locationMode === 'auto') {
+              getUserLocation();
+            } else if (selectedCity) {
+              getWeatherByCoords(selectedCity.lat, selectedCity.lon);
+            }
+          }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+      }, [locationLoaded, locationMode, selectedCity]);
+
+      // Close menu when clicking overlay
+      const closeMenu = () => {
+        setMenuOpen(false);
+      };
+
+      const toggleMenu = () => {
+        setMenuOpen(!menuOpen);
+      };
+
+      const toggleDarkMode = () => {
+        setDarkMode(!darkMode);
+      };
+
+      const changeLanguage = (lang) => {
+        setLanguage(lang);
+      };
+
+      const handleWelcomeChoice = (mode) => {
+        setLocationMode(mode);
+        localStorage.setItem('locationMode', mode);
+        setShowWelcome(false);
+        
+        if (mode === 'auto') {
+          getUserLocation();
+        } else {
+          setShowCitySelector(true);
+        }
+      };
+
+      const handleCitySelect = (city) => {
+        setSelectedCity(city);
+        localStorage.setItem('selectedCity', JSON.stringify(city));
+        setShowCitySelector(false);
+        getWeatherByCoords(city.lat, city.lon);
+        setLocationLoaded(true);
+      };
+
+      const toggleLocationMode = () => {
+        const newMode = locationMode === 'auto' ? 'manual' : 'auto';
+        setLocationMode(newMode);
+        localStorage.setItem('locationMode', newMode);
+        
+        if (newMode === 'manual') {
+          setShowCitySelector(true);
+        } else {
+          setSelectedCity(null);
+          localStorage.removeItem('selectedCity');
+          getUserLocation();
+        }
+        setMenuOpen(false);
+      };
+
+      const openCitySelector = () => {
+        setShowCitySelector(true);
+        setMenuOpen(false);
+      };
+
+      const getWeatherByCoords = async (latitude, longitude) => {
+        setLoading(true);
+        setError(null);
+        
+        try {
+          // Get weather data first
+          const weatherResponse = await fetch(
+            `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,apparent_temperature&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto`
+          );
+          const weatherData = await weatherResponse.json();
+          
+          // Use BigDataCloud for more accurate reverse geocoding
+          const geoResponse = await fetch(
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+          );
+          const geoData = await geoResponse.json();
+          
+          let locationName = `${latitude.toFixed(2)}°, ${longitude.toFixed(2)}°`;
+          if (geoData) {
+            // Try to get the most accurate locality
+            const city = geoData.city || geoData.locality || geoData.principalSubdivision;
+            const country = geoData.countryName;
+            if (city) {
+              locationName = country ? `${city}, ${country}` : city;
+            }
+          }
+          
+          setWeather({
+            location: locationName,
+            temperature: Math.round(weatherData.current.temperature_2m),
+            humidity: weatherData.current.relative_humidity_2m,
+            precipitation: weatherData.current.precipitation,
+            windSpeed: Math.round(weatherData.current.wind_speed_10m),
+            weatherCode: weatherData.current.weather_code,
+            tempMax: Math.round(weatherData.daily.temperature_2m_max[0]),
+            tempMin: Math.round(weatherData.daily.temperature_2m_min[0]),
+            rainChance: weatherData.daily.precipitation_probability_max[0] || 0,
+            feelsLike: Math.round(weatherData.current.apparent_temperature)
+          });
+          setLastUpdated(new Date());
+        } catch (err) {
+          setError(err.message || t.errorFetch);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      const getUserLocation = () => {
+        if (!navigator.geolocation) {
+          setError(t.errorLocation);
+          return;
+        }
+
+        setLoading(true);
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            setLocationLoaded(true);
+            getWeatherByCoords(position.coords.latitude, position.coords.longitude);
+          },
+          (err) => {
+            setLoading(false);
+            let errorMessage = t.errorLocation;
+            
+            switch(err.code) {
+              case err.PERMISSION_DENIED:
+                errorMessage = t.errorPermission;
+                break;
+              case err.POSITION_UNAVAILABLE:
+                errorMessage = t.errorUnavailable;
+                break;
+              case err.TIMEOUT:
+                errorMessage = t.errorTimeout;
+                break;
+            }
+            
+            setError(errorMessage);
+          }
+        );
+      };
+
+      const handleRefresh = () => {
+        setMenuOpen(false);
+        if (locationMode === 'auto') {
+          getUserLocation();
+        } else if (selectedCity) {
+          getWeatherByCoords(selectedCity.lat, selectedCity.lon);
+        }
+      };
+
+      const getOutfitRecommendations = () => {
+        if (!weather) return null;
+
+        const { temperature, feelsLike, precipitation, windSpeed, humidity } = weather;
+        const temp = feelsLike; // Use apparent temperature for better recommendations
+        
+        const outfit = {
+          items: [],
+          advice: ''
+        };
+
+        // Base layers
+        if (temp < 0) {
+          outfit.items.push({
+            icon: '🧥',
+            category: t.outerLayer,
+            description: t.heavyCoat
+          });
+          outfit.items.push({
+            icon: '🧣',
+            category: t.accessories,
+            description: t.warmAccessories
+          });
+        } else if (temp < 10) {
+          outfit.items.push({
+            icon: '🧥',
+            category: t.outerLayer,
+            description: t.warmJacket
+          });
+          outfit.items.push({
+            icon: '🧤',
+            category: t.accessories,
+            description: t.lightGloves
+          });
+        } else if (temp < 15) {
+          outfit.items.push({
+            icon: '🧥',
+            category: t.outerLayer,
+            description: t.lightJacket
+          });
+        } else if (temp < 20) {
+          outfit.items.push({
+            icon: '👕',
+            category: t.top,
+            description: t.longSleeve
+          });
+        } else if (temp < 25) {
+          outfit.items.push({
+            icon: '👕',
+            category: t.top,
+            description: t.shortSleeve
+          });
+        } else {
+          outfit.items.push({
+            icon: '👕',
+            category: t.top,
+            description: t.lightClothing
+          });
+        }
+
+        // Bottoms
+        if (temp < 10) {
+          outfit.items.push({
+            icon: '👖',
+            category: t.bottoms,
+            description: t.warmPants
+          });
+        } else if (temp < 20) {
+          outfit.items.push({
+            icon: '👖',
+            category: t.bottoms,
+            description: t.jeans
+          });
+        } else {
+          outfit.items.push({
+            icon: '🩳',
+            category: t.bottoms,
+            description: t.shorts
+          });
+        }
+
+        // Footwear
+        if (precipitation > 0) {
+          outfit.items.push({
+            icon: '🥾',
+            category: t.footwear,
+            description: t.waterproofBoots
+          });
+        } else if (temp < 10) {
+          outfit.items.push({
+            icon: '👞',
+            category: t.footwear,
+            description: t.closedShoes
+          });
+        } else {
+          outfit.items.push({
+            icon: '👟',
+            category: t.footwear,
+            description: t.sneakers
+          });
+        }
+
+        // Rain gear
+        if (precipitation > 0 || humidity > 80) {
+          outfit.items.push({
+            icon: '☂️',
+            category: t.rainGear,
+            description: t.umbrella
+          });
+        }
+
+        // Wind protection
+        if (windSpeed > 20) {
+          outfit.items.push({
+            icon: '🌬️',
+            category: t.windProtection,
+            description: t.windbreaker
+          });
+        }
+
+        // Sun protection
+        if (temp > 25 && precipitation === 0) {
+          outfit.items.push({
+            icon: '🕶️',
+            category: t.sunProtection,
+            description: t.sunglasses
+          });
+        }
+
+        // General advice
+        if (temp < 0) {
+          outfit.advice = t.adviceExtremeCold;
+        } else if (temp < 10) {
+          outfit.advice = t.adviceCold;
+        } else if (temp > 30) {
+          outfit.advice = t.adviceHot;
+        } else if (precipitation > 0) {
+          outfit.advice = t.adviceRain;
+        } else if (humidity > 70) {
+          outfit.advice = t.adviceHumidity;
+        } else {
+          outfit.advice = t.advicePerfect;
+        }
+
+        return outfit;
+      };
+
+      const outfit = getOutfitRecommendations();
+
+      return (
+        <div className="app-container" style={{ direction: language === 'he' ? 'rtl' : 'ltr' }}>
+          {showAbout && (
+            <div className="about-popup" onClick={() => setShowAbout(false)}>
+              <div className="about-content" onClick={(e) => e.stopPropagation()}>
+                <h2 className="about-title">{t.aboutTitle}</h2>
+                <p className="about-text">{t.aboutText}</p>
+                <p className="about-developer">{t.aboutDeveloper}</p>
+                <button className="close-button" onClick={() => setShowAbout(false)}>
+                  {t.close}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {showWelcome && (
+            <div className="welcome-screen">
+              <div className="welcome-content">
+                <h1 className="welcome-title">{t.welcomeTitle}</h1>
+                <p className="welcome-subtitle">{t.welcomeSubtitle}</p>
+                <div className="welcome-options">
+                  <div className="welcome-option" onClick={() => handleWelcomeChoice('auto')}>
+                    <div className="welcome-option-icon">📍</div>
+                    <div className="welcome-option-title">{t.welcomeAutomatic}</div>
+                    <div className="welcome-option-desc">{t.welcomeAutomaticDesc}</div>
+                  </div>
+                  <div className="welcome-option" onClick={() => handleWelcomeChoice('manual')}>
+                    <div className="welcome-option-icon">🌍</div>
+                    <div className="welcome-option-title">{t.welcomeManual}</div>
+                    <div className="welcome-option-desc">{t.welcomeManualDesc}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {showCitySelector && (
+            <div className="city-selector">
+              <div className="city-selector-header">
+                <h2 className="city-selector-title">{t.selectCity}</h2>
+                <input
+                  type="text"
+                  className="city-search"
+                  placeholder={t.searchCity}
+                  value={citySearch}
+                  onChange={(e) => setCitySearch(e.target.value)}
+                />
+              </div>
+              <div className="city-list">
+                {filteredCities.map((city, index) => (
+                  <div key={index} className="city-item" onClick={() => handleCitySelect(city)}>
+                    <span className="city-item-icon">📍</span>
+                    <div className="city-item-text">
+                      <div className="city-item-name">{city.name}</div>
+                      <div className="city-item-country">{city.country}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className={`menu-overlay ${menuOpen ? 'show' : ''}`} onClick={closeMenu}></div>
+          
+          <div className={`side-menu ${menuOpen ? 'open' : ''}`}>
+            <div className="menu-section">
+              <div className="menu-title">{t.menuSettings}</div>
+            </div>
+
+            <div className="menu-section">
+              <div className="menu-title">{t.menuRefreshWeather}</div>
+              <div className="menu-option" onClick={handleRefresh}>
+                <span className="menu-option-label">🔄 {t.menuRefreshWeather}</span>
+                <span className="menu-option-value">→</span>
+              </div>
+            </div>
+
+            <div className="menu-section">
+              <div className="menu-title">{t.menuLanguage}</div>
+              <div className="menu-option" onClick={() => changeLanguage('en')}>
+                <span className="menu-option-label">{t.languageEnglish}</span>
+                {language === 'en' && <span className="menu-option-value">✓</span>}
+              </div>
+              <div className="menu-option" onClick={() => changeLanguage('he')}>
+                <span className="menu-option-label">{t.languageHebrew}</span>
+                {language === 'he' && <span className="menu-option-value">✓</span>}
+              </div>
+            </div>
+
+            <div className="menu-section">
+              <div className="menu-title">{t.menuDarkMode}</div>
+              <div className="menu-option" onClick={toggleDarkMode}>
+                <span className="menu-option-label">{t.menuDarkMode}</span>
+                <div className={`toggle-switch ${darkMode ? 'active' : ''}`}>
+                  <div className="toggle-slider"></div>
+                </div>
+              </div>
+            </div>
+
+            <div className="menu-section">
+              <div className="menu-title">{t.menuLocationMode}</div>
+              <div className="menu-option" onClick={toggleLocationMode}>
+                <span className="menu-option-label">
+                  {locationMode === 'auto' ? '⚙️ Manual' : '📍 Automatic'}
+                </span>
+                <span className="menu-option-value">→</span>
+              </div>
+              {locationMode === 'manual' && (
+                <div className="menu-option" onClick={openCitySelector}>
+                  <span className="menu-option-label">⚙️ Manual</span>
+                  <span className="menu-option-value">→</span>
+                </div>
+              )}
+            </div>
+
+            <div className="menu-section">
+              <div className="menu-title">{t.menuAddToHome}</div>
+              <div className="menu-option" onClick={handleAddToHomeScreen}>
+                <span className="menu-option-label">📱 {t.menuAddToHome}</span>
+                <span className="menu-option-value">→</span>
+              </div>
+            </div>
+
+            <div className="menu-section">
+              <div className="menu-title">{t.menuAbout}</div>
+              <div className="menu-option" onClick={() => { setShowAbout(true); setMenuOpen(false); }}>
+                <span className="menu-option-label">ℹ️ {t.menuAbout}</span>
+                <span className="menu-option-value">→</span>
+              </div>
+            </div>
+          </div>
+
+          <header className={`header ${getWeatherTheme()}`}>
+            <button className={`menu-button ${menuOpen ? 'active' : ''}`} onClick={toggleMenu}>
+              <div className="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </button>
+            {weather && <div className="weather-animation">{getWeatherIcon()}</div>}
+            <div className="greeting">{getGreeting()}</div>
+            <h1 className="logo">{t.title}</h1>
+            <p className="tagline">{t.tagline}</p>
+          </header>
+
+          <div className="weather-card">
+            {!locationLoaded && !error && (
+              <div className="location-detect">
+                <div className="location-detect-icon">📍</div>
+                <h3>{t.detecting}</h3>
+                <p>{t.allowAccess}</p>
+              </div>
+            )}
+
+            {error && (
+              <div className="error">
+                ⚠️ {error}
+                <button 
+                  onClick={handleRefresh}
+                  style={{
+                    marginTop: '15px',
+                    width: '100%'
+                  }}
+                >
+                  {t.tryAgain}
+                </button>
+              </div>
+            )}
+
+            {loading && (
+              <div className="loading">
+                🌐 {t.scanning}
+              </div>
+            )}
+
+            {weather && !loading && (
+              <>
+                {getWeatherTip() && (
+                  <div className="weather-tip">
+                    <div className="weather-tip-icon">{getWeatherTip().icon}</div>
+                    <div className="weather-tip-text">{getWeatherTip().text}</div>
+                  </div>
+                )}
+
+                <h2 className="location-title">
+                  📍 {weather.location}
+                </h2>
+                
+                {lastUpdated && (
+                  <div className="last-updated">
+                    {getTimeAgo()}
+                  </div>
+                )}
+                
+                <div className="weather-info">
+                  <div className="info-box">
+                    <div className="info-label">{t.temperature}</div>
+                    <div className="info-value">{weather.temperature}°C</div>
+                  </div>
+                  <div className="info-box">
+                    <div className="info-label">{t.humidity}</div>
+                    <div className="info-value">{weather.humidity}%</div>
+                  </div>
+                  <div className="info-box">
+                    <div className="info-label">{t.windSpeed}</div>
+                    <div className="info-value">{weather.windSpeed} km/h</div>
+                  </div>
+                  <div className="info-box">
+                    <div className="info-label">{t.rainChance}</div>
+                    <div className="info-value">{weather.rainChance}%</div>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          {outfit && !loading && (
+            <div className="outfit-card">
+              <h2 className="outfit-title">{t.yourOutfit}</h2>
+              
+              <div className="outfit-items">
+                {outfit.items.map((item, index) => (
+                  <div key={index} className="outfit-item">
+                    <span className="outfit-icon">{item.icon}</span>
+                    <div className="outfit-text">
+                      <div className="outfit-category">{item.category}</div>
+                      <div className="outfit-description">{item.description}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // Wait for React to load, then render
+    function initApp() {
+      try {
+        if (typeof React === 'undefined' || typeof ReactDOM === 'undefined') {
+          throw new Error('React not loaded');
+        }
+        
+        ReactDOM.render(
+          <ErrorBoundary>
+            <WeatherOutfitApp />
+          </ErrorBoundary>, 
+          document.getElementById('root')
+        );
+      } catch (error) {
+        console.error('Failed to render app:', error);
+        document.getElementById('root').innerHTML = `
+          <div style="padding: 40px; text-align: center; font-family: sans-serif;">
+            <h1>⚠️ Failed to Load</h1>
+            <p>The app couldn't load properly. Please:</p>
+            <ul style="text-align: left; display: inline-block; margin: 20px 0;">
+              <li>Check your internet connection</li>
+              <li>Make sure JavaScript is enabled</li>
+              <li>Try refreshing the page</li>
+            </ul>
+            <br>
+            <button onclick="window.location.reload()" 
+                    style="padding: 12px 24px; background: #A8D8EA; 
+                           border: none; border-radius: 8px; cursor: pointer; margin-top: 20px;">
+              Refresh Page
+            </button>
+          </div>
+        `;
+      }
+    }
+    
+    // Try to initialize immediately
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      initApp();
+    }
+    
+    // Fallback: if still showing loading after 5 seconds, show error
+    setTimeout(() => {
+      const root = document.getElementById('root');
+      if (root && root.innerHTML.includes('Loading app...')) {
+        root.innerHTML = `
+          <div style="padding: 40px; text-align: center; font-family: sans-serif;">
+            <h1>⚠️ Loading Timeout</h1>
+            <p>The app is taking too long to load. This might be because:</p>
+            <ul style="text-align: left; display: inline-block; margin: 20px 0;">
+              <li>Slow internet connection</li>
+              <li>External scripts are blocked</li>
+              <li>Browser compatibility issues</li>
+            </ul>
+            <br>
+            <button onclick="window.location.reload()" 
+                    style="padding: 12px 24px; background: #A8D8EA; 
+                           border: none; border-radius: 8px; cursor: pointer; margin-top: 20px;">
+              Try Again
+            </button>
+          </div>
+        `;
+      }
+    }, 5000);
+  </script>
+</body>
+</html>
