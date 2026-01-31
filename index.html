@@ -102,16 +102,195 @@
       overflow: hidden;
     }
 
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
     .header.sunny {
       background: linear-gradient(135deg, #FFD93D 0%, #FFA500 100%);
+      animation: sunnyPulse 3s ease-in-out infinite;
+    }
+
+    .header.sunny::before {
+      background: radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.4) 0%, transparent 50%);
+      animation: sunGlow 4s ease-in-out infinite;
+    }
+
+    .header.sunrise {
+      background: linear-gradient(135deg, #FF9A8B 0%, #FF6A88 50%, #FF99AC 100%);
+      animation: sunriseGlow 4s ease-in-out infinite;
+    }
+
+    .header.sunrise::before {
+      background: radial-gradient(circle at 50% 70%, rgba(255, 200, 150, 0.5) 0%, transparent 60%);
+      animation: sunRise 5s ease-in-out infinite;
+    }
+
+    .header.evening {
+      background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+      animation: sunsetShimmer 4s ease-in-out infinite;
+    }
+
+    .header.evening::before {
+      background: linear-gradient(90deg, transparent 0%, rgba(255, 200, 100, 0.3) 50%, transparent 100%);
+      animation: sunsetGlow 3s ease-in-out infinite;
+    }
+
+    .header.night {
+      background: linear-gradient(135deg, #1e3a5f 0%, #2d4a6e 100%);
+      animation: nightTwinkle 8s ease-in-out infinite;
+    }
+
+    .header.night::before {
+      background: radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.15) 0%, transparent 30%),
+                  radial-gradient(circle at 20% 60%, rgba(255, 255, 255, 0.08) 0%, transparent 20%),
+                  radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.12) 0%, transparent 25%),
+                  radial-gradient(circle at 40% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 15%),
+                  radial-gradient(circle at 90% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 18%);
+      animation: starsShimmer 6s ease-in-out infinite;
+    }
+
+    .header.rainy-night {
+      background: linear-gradient(135deg, #1a2f47 0%, #2a3f5f 100%);
+      animation: nightRainyWave 3s ease-in-out infinite;
+    }
+
+    .header.rainy-night::before {
+      background: repeating-linear-gradient(
+        110deg,
+        transparent,
+        transparent 8px,
+        rgba(150, 180, 220, 0.2) 8px,
+        rgba(150, 180, 220, 0.2) 10px
+      );
+      animation: nightRainFall 1.5s linear infinite;
+    }
+
+    .header.cloudy-night {
+      background: linear-gradient(135deg, #2a3a52 0%, #3a4a62 100%);
+      animation: nightCloudyDrift 5s ease-in-out infinite;
+    }
+
+    .header.cloudy-night::before {
+      background: radial-gradient(ellipse at 50% 40%, rgba(200, 210, 230, 0.15) 0%, transparent 60%),
+                  radial-gradient(ellipse at 70% 60%, rgba(200, 210, 230, 0.1) 0%, transparent 50%);
+      animation: nightCloudMove 8s ease-in-out infinite;
     }
 
     .header.rainy {
       background: linear-gradient(135deg, #6B9AC4 0%, #4A7BA7 100%);
+      animation: rainyWave 3s ease-in-out infinite;
+    }
+
+    .header.rainy::before {
+      background: repeating-linear-gradient(
+        110deg,
+        transparent,
+        transparent 8px,
+        rgba(255, 255, 255, 0.15) 8px,
+        rgba(255, 255, 255, 0.15) 10px
+      );
+      animation: rainFall 1.5s linear infinite;
     }
 
     .header.cloudy {
       background: linear-gradient(135deg, #B0C4DE 0%, #9AADCA 100%);
+      animation: cloudyDrift 5s ease-in-out infinite;
+    }
+
+    .header.cloudy::before {
+      background: radial-gradient(ellipse at 40% 50%, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
+                  radial-gradient(ellipse at 70% 40%, rgba(255, 255, 255, 0.2) 0%, transparent 40%);
+      animation: cloudMove 8s ease-in-out infinite;
+    }
+
+    @keyframes sunnyPulse {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.1); }
+    }
+
+    @keyframes sunGlow {
+      0%, 100% { transform: scale(1) translateX(0); opacity: 0.3; }
+      50% { transform: scale(1.1) translateX(10px); opacity: 0.5; }
+    }
+
+    @keyframes sunriseGlow {
+      0%, 100% { filter: hue-rotate(0deg) brightness(1); }
+      50% { filter: hue-rotate(-10deg) brightness(1.1); }
+    }
+
+    @keyframes sunRise {
+      0%, 100% { transform: translateY(30%) scale(0.8); opacity: 0.4; }
+      50% { transform: translateY(10%) scale(1); opacity: 0.6; }
+    }
+
+    @keyframes sunsetShimmer {
+      0%, 100% { filter: hue-rotate(0deg) brightness(1); }
+      50% { filter: hue-rotate(5deg) brightness(1.05); }
+    }
+
+    @keyframes sunsetGlow {
+      0%, 100% { transform: translateX(-20%); opacity: 0.2; }
+      50% { transform: translateX(20%); opacity: 0.4; }
+    }
+
+    @keyframes nightTwinkle {
+      0%, 100% { filter: brightness(0.95); }
+      50% { filter: brightness(1.05); }
+    }
+
+    @keyframes starsShimmer {
+      0%, 100% { opacity: 0.3; }
+      25% { opacity: 0.5; }
+      50% { opacity: 0.4; }
+      75% { opacity: 0.6; }
+    }
+
+    @keyframes rainyWave {
+      0%, 100% { filter: brightness(0.95); }
+      50% { filter: brightness(1.05); }
+    }
+
+    @keyframes rainFall {
+      0% { transform: translateY(-20px); }
+      100% { transform: translateY(20px); }
+    }
+
+    @keyframes cloudyDrift {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.05); }
+    }
+
+    @keyframes cloudMove {
+      0%, 100% { transform: translateX(-10px); opacity: 0.25; }
+      50% { transform: translateX(10px); opacity: 0.35; }
+    }
+
+    @keyframes nightRainyWave {
+      0%, 100% { filter: brightness(0.9); }
+      50% { filter: brightness(1); }
+    }
+
+    @keyframes nightRainFall {
+      0% { transform: translateY(-20px) translateX(-5px); opacity: 0.3; }
+      100% { transform: translateY(20px) translateX(5px); opacity: 0.1; }
+    }
+
+    @keyframes nightCloudyDrift {
+      0%, 100% { filter: brightness(0.95); }
+      50% { filter: brightness(1.05); }
+    }
+
+    @keyframes nightCloudMove {
+      0%, 100% { transform: translateX(-15px); opacity: 0.15; }
+      50% { transform: translateX(15px); opacity: 0.25; }
     }
 
     .scroll-arrow {
@@ -1184,27 +1363,72 @@
       const getWeatherTheme = () => {
         if (!weather) return '';
         const code = weather.weatherCode;
-        // Clear sky
+        const currentHour = new Date().getHours();
+        const isSunrise = currentHour >= 5 && currentHour < 7; // 5 AM to 7 AM is sunrise
+        const isEvening = currentHour >= 18 && currentHour < 21; // 6 PM to 9 PM is sunset/evening
+        const isNight = currentHour >= 21 || currentHour < 5; // 9 PM to 5 AM is night
+        
+        // Apply night theme to all conditions at night
+        if (isNight) {
+          // Even when raining or cloudy, use night theme
+          if (code >= 51 && code <= 82) return 'rainy-night'; // Rainy night
+          if (code === 2 || code === 3) return 'cloudy-night'; // Cloudy night
+          return 'night'; // Clear night
+        }
+        
+        // Apply evening theme
+        if (isEvening) {
+          if (code >= 51 && code <= 82) return 'rainy'; // Rainy evening stays rainy
+          if (code === 2 || code === 3) return 'cloudy'; // Cloudy evening
+          return 'evening'; // Clear evening/sunset
+        }
+        
+        // Apply sunrise theme
+        if (isSunrise) {
+          if (code >= 51 && code <= 82) return 'rainy';
+          if (code === 2 || code === 3) return 'cloudy';
+          return 'sunrise'; // Clear sunrise
+        }
+        
+        // Daytime themes
         if (code === 0 || code === 1) return 'sunny';
-        // Rain
         if (code >= 51 && code <= 67) return 'rainy';
         if (code >= 80 && code <= 82) return 'rainy';
-        // Cloudy
         if (code === 2 || code === 3) return 'cloudy';
+        
         return '';
       };
 
-      // Get weather icon based on weather code
+      // Get weather icon based on weather code and time of day
       const getWeatherIcon = () => {
         if (!weather) return '☀️';
         const code = weather.weatherCode;
-        if (code === 0 || code === 1) return '☀️';
-        if (code === 2) return '⛅';
+        const currentHour = new Date().getHours();
+        const isSunrise = currentHour >= 5 && currentHour < 7; // 5 AM to 7 AM is sunrise
+        const isEvening = currentHour >= 18 && currentHour < 21; // 6 PM to 9 PM is sunset/evening
+        const isNight = currentHour >= 21 || currentHour < 5; // 9 PM to 5 AM is night
+        
+        // Clear sky - show appropriate icon for time
+        if (code === 0 || code === 1) {
+          if (isNight) return '🌙'; // Moon at night
+          if (isEvening) return '🌆'; // Sunset/dusk in evening
+          if (isSunrise) return '🌅'; // Sunrise in early morning
+          return '☀️'; // Sun during day
+        }
+        if (code === 2) {
+          if (isNight) return '☁️';
+          if (isEvening || isSunrise) return '🌥️'; // Cloudy with sun setting/rising
+          return '⛅'; // Partly cloudy during day
+        }
         if (code === 3) return '☁️';
         if (code >= 51 && code <= 67) return '🌧️';
         if (code >= 71 && code <= 77) return '❄️';
         if (code >= 80 && code <= 82) return '⛈️';
         if (code >= 95 && code <= 99) return '⛈️';
+        
+        if (isNight) return '🌙';
+        if (isEvening) return '🌆';
+        if (isSunrise) return '🌅';
         return '🌤️';
       };
 
@@ -1215,15 +1439,22 @@
         const { temperature, tempMax, tempMin, rainChance, humidity, windSpeed, weatherCode, feelsLike } = weather;
         const tempDiff = tempMax - tempMin;
         const currentHour = new Date().getHours();
-        const isMorning = currentHour >= 5 && currentHour < 12;
-        const isAfternoon = currentHour >= 12 && currentHour < 17;
-        const isEvening = currentHour >= 17 && currentHour < 21;
+        const isSunrise = currentHour >= 5 && currentHour < 7; // 5 AM to 7 AM is sunrise
+        const isMorning = currentHour >= 7 && currentHour < 12;
+        const isAfternoon = currentHour >= 12 && currentHour < 18;
+        const isEvening = currentHour >= 18 && currentHour < 21; // 6 PM to 9 PM is sunset/evening
+        const isNight = currentHour >= 21 || currentHour < 5; // 9 PM to 5 AM is night
         
         let tip = { icon: '💡', text: '' };
 
-        // Get weather condition description
+        // Get weather condition description (time-aware)
         const getWeatherDesc = () => {
-          if (weatherCode === 0 || weatherCode === 1) return language === 'en' ? 'sunny' : 'שמשי';
+          if (weatherCode === 0 || weatherCode === 1) {
+            if (isNight) return language === 'en' ? 'clear night' : 'לילה בהיר';
+            if (isEvening) return language === 'en' ? 'clear evening' : 'ערב בהיר';
+            if (isSunrise) return language === 'en' ? 'clear sunrise' : 'זריחה בהירה';
+            return language === 'en' ? 'sunny' : 'שמשי';
+          }
           if (weatherCode === 2) return language === 'en' ? 'partly cloudy' : 'מעונן חלקית';
           if (weatherCode === 3) return language === 'en' ? 'cloudy' : 'מעונן';
           if (weatherCode >= 51 && weatherCode <= 67) return language === 'en' ? 'rainy' : 'גשום';
@@ -1234,12 +1465,31 @@
 
         const weatherDesc = getWeatherDesc();
 
-        // Priority 1: High rain chance
-        if (rainChance > 60) {
+        // Priority 1: Very high rain chance - umbrella essential
+        if (rainChance > 70) {
           tip.icon = '☔';
+          const timePeriod = isNight 
+            ? (language === 'en' ? 'tonight' : 'הלילה')
+            : isEvening 
+            ? (language === 'en' ? 'this evening' : 'הערב')
+            : (language === 'en' ? 'today' : 'היום');
           tip.text = language === 'en' 
-            ? `It's going to rain today. Don't forget your umbrella!`
-            : `הולך לרדת גשם היום. אל תשכח מטריה!`;
+            ? `It's going to rain ${timePeriod}. Don't forget your umbrella!`
+            : `הולך לרדת גשם ${timePeriod}. אל תשכח מטריה!`;
+          return tip;
+        }
+
+        // Priority 2: Medium rain chance - consider umbrella
+        if (rainChance > 40) {
+          tip.icon = '🌂';
+          const timePeriod = isNight 
+            ? (language === 'en' ? 'tonight' : 'הלילה')
+            : isEvening 
+            ? (language === 'en' ? 'this evening' : 'הערב')
+            : (language === 'en' ? 'today' : 'היום');
+          tip.text = language === 'en' 
+            ? `There's a chance of rain ${timePeriod}. Consider bringing an umbrella.`
+            : `יש סיכוי לגשם ${timePeriod}. שקול לקחת מטריה.`;
           return tip;
         }
 
@@ -1279,26 +1529,34 @@
           return tip;
         }
 
-        // Priority 6: Very hot day
-        if (tempMax > 30) {
+        // Priority 6: Very hot day (only if not late evening/night)
+        if (tempMax > 30 && !isNight && currentHour < 19) {
           tip.icon = '🥵';
+          const timePeriod = isEvening 
+            ? (language === 'en' ? 'this evening' : 'הערב')
+            : (language === 'en' ? 'today' : 'היום');
           tip.text = language === 'en'
-            ? `Hot and ${weatherDesc} today! Stay hydrated, wear sunscreen, and bring a hat.`
-            : `חם ו${weatherDesc} היום! שתה הרבה מים, שים קרם הגנה ולבש כובע.`;
+            ? `Hot and ${weatherDesc} ${timePeriod}! Stay hydrated, wear sunscreen, and bring a hat.`
+            : `חם ו${weatherDesc} ${timePeriod}! שתה הרבה מים, שים קרם הגנה ולבש כובע.`;
           return tip;
         }
 
         // Priority 7: Cold day
         if (tempMax < 10) {
           tip.icon = '❄️';
+          const timePeriod = isNight 
+            ? (language === 'en' ? 'tonight' : 'הלילה')
+            : isEvening 
+            ? (language === 'en' ? 'this evening' : 'הערב')
+            : (language === 'en' ? 'today' : 'היום');
           tip.text = language === 'en'
-            ? `Cold and ${weatherDesc} today. Dress warmly in layers!`
-            : `קר ו${weatherDesc} היום. התלבש בשכבות חמות!`;
+            ? `Cold and ${weatherDesc} ${timePeriod}. Dress warmly in layers!`
+            : `קר ו${weatherDesc} ${timePeriod}. התלבש בשכבות חמות!`;
           return tip;
         }
 
-        // Priority 8: Sunny + warm combo
-        if ((weatherCode === 0 || weatherCode === 1) && tempMax > 25) {
+        // Priority 8: Sunny + warm combo (only during daytime, not evening/night)
+        if ((weatherCode === 0 || weatherCode === 1) && tempMax > 25 && !isNight && !isEvening) {
           tip.icon = '😎';
           tip.text = language === 'en'
             ? `Beautiful sunny day ahead! Don't forget sunglasses and sunscreen.`
@@ -1309,9 +1567,14 @@
         // Priority 9: Very windy
         if (windSpeed > 25) {
           tip.icon = '💨';
+          const timePeriod = isNight 
+            ? (language === 'en' ? 'tonight' : 'הלילה')
+            : isEvening 
+            ? (language === 'en' ? 'this evening' : 'הערב')
+            : (language === 'en' ? 'today' : 'היום');
           tip.text = language === 'en'
-            ? `Very windy and ${weatherDesc} today. Wear a windbreaker and secure loose items.`
-            : `רוח חזקה מאוד ו${weatherDesc} היום. לבש ג'קט רוח ואבטח פריטים רופפים.`;
+            ? `Very windy and ${weatherDesc} ${timePeriod}. Wear a windbreaker and secure loose items.`
+            : `רוח חזקה מאוד ו${weatherDesc} ${timePeriod}. לבש ג'קט רוח ואבטח פריטים רופפים.`;
           return tip;
         }
 
@@ -1333,20 +1596,44 @@
           return tip;
         }
 
-        // Priority 12: Cloudy day
+        // Priority 12: Cloudy weather (time-appropriate message)
         if (weatherCode === 3) {
           tip.icon = '☁️';
-          tip.text = language === 'en'
-            ? `Cloudy and comfortable today. Perfect weather for outdoor activities!`
-            : `מעונן ונעים היום. מזג אוויר מושלם לפעילויות בחוץ!`;
+          if (isNight) {
+            tip.text = language === 'en'
+              ? `Cloudy and comfortable tonight. Good weather for indoor activities.`
+              : `מעונן ונעים הלילה. מזג אוויר טוב לפעילויות בבית.`;
+          } else if (isEvening) {
+            tip.text = language === 'en'
+              ? `Cloudy and pleasant this evening. Nice for a relaxing evening.`
+              : `מעונן ונעים הערב. נחמד לערב רגוע.`;
+          } else {
+            tip.text = language === 'en'
+              ? `Cloudy and comfortable today. Perfect weather for outdoor activities!`
+              : `מעונן ונעים היום. מזג אוויר מושלם לפעילויות בחוץ!`;
+          }
           return tip;
         }
 
-        // Default: Pleasant weather
+        // Default: Pleasant weather (time-appropriate activities)
         tip.icon = '✨';
-        tip.text = language === 'en'
-          ? `Perfect ${weatherDesc} weather today! Great day to be outside.`
-          : `מזג אוויר ${weatherDesc} מושלם היום! יום נהדר לצאת החוצה.`;
+        if (isNight) {
+          tip.text = language === 'en'
+            ? `${weatherDesc.charAt(0).toUpperCase() + weatherDesc.slice(1)}! Great night to stay cozy indoors.`
+            : `${weatherDesc}! לילה נהדר להישאר בנוחות בבית.`;
+        } else if (isEvening) {
+          tip.text = language === 'en'
+            ? `${weatherDesc.charAt(0).toUpperCase() + weatherDesc.slice(1)}! Perfect for an evening walk or relaxing at home.`
+            : `${weatherDesc}! מושלם לטיול ערב או להירגע בבית.`;
+        } else if (isSunrise) {
+          tip.text = language === 'en'
+            ? `Beautiful sunrise! Perfect way to start your day.`
+            : `זריחה יפהפייה! דרך מושלמת להתחיל את היום.`;
+        } else {
+          tip.text = language === 'en'
+            ? `Perfect ${weatherDesc} weather today! Great day to be outside.`
+            : `מזג אוויר ${weatherDesc} מושלם היום! יום נהדר לצאת החוצה.`;
+        }
         
         return tip;
       };
@@ -1400,14 +1687,49 @@
 
       // Popular cities list that work well with the API
       const popularCities = [
+        // Israeli Cities (Main Focus)
         { name: "Tel Aviv", country: "Israel", lat: 32.0853, lon: 34.7818 },
         { name: "Jerusalem", country: "Israel", lat: 31.7683, lon: 35.2137 },
         { name: "Haifa", country: "Israel", lat: 32.7940, lon: 34.9896 },
-        { name: "Rehovot", country: "Israel", lat: 31.8914, lon: 34.8078 },
-        { name: "Or Akiva", country: "Israel", lat: 32.5094, lon: 34.9214 },
-        { name: "Netanya", country: "Israel", lat: 32.3215, lon: 34.8532 },
         { name: "Beer Sheva", country: "Israel", lat: 31.2518, lon: 34.7913 },
         { name: "Eilat", country: "Israel", lat: 29.5577, lon: 34.9519 },
+        { name: "Netanya", country: "Israel", lat: 32.3215, lon: 34.8532 },
+        { name: "Ashdod", country: "Israel", lat: 31.8044, lon: 34.6553 },
+        { name: "Ashkelon", country: "Israel", lat: 31.6688, lon: 34.5742 },
+        { name: "Rishon LeZion", country: "Israel", lat: 31.9730, lon: 34.7925 },
+        { name: "Petah Tikva", country: "Israel", lat: 32.0878, lon: 34.8878 },
+        { name: "Holon", country: "Israel", lat: 32.0117, lon: 34.7742 },
+        { name: "Bnei Brak", country: "Israel", lat: 32.0808, lon: 34.8339 },
+        { name: "Ramat Gan", country: "Israel", lat: 32.0700, lon: 34.8244 },
+        { name: "Bat Yam", country: "Israel", lat: 32.0192, lon: 34.7506 },
+        { name: "Herzliya", country: "Israel", lat: 32.1656, lon: 34.8433 },
+        { name: "Kfar Saba", country: "Israel", lat: 32.1769, lon: 34.9072 },
+        { name: "Hadera", country: "Israel", lat: 32.4344, lon: 34.9189 },
+        { name: "Rehovot", country: "Israel", lat: 31.8914, lon: 34.8078 },
+        { name: "Modiin", country: "Israel", lat: 31.8969, lon: 35.0097 },
+        { name: "Nazareth", country: "Israel", lat: 32.7025, lon: 35.2978 },
+        { name: "Tiberias", country: "Israel", lat: 32.7950, lon: 35.5319 },
+        { name: "Acre (Akko)", country: "Israel", lat: 32.9275, lon: 35.0833 },
+        { name: "Nahariya", country: "Israel", lat: 33.0058, lon: 35.0939 },
+        { name: "Safed (Tzfat)", country: "Israel", lat: 32.9658, lon: 35.4983 },
+        { name: "Dimona", country: "Israel", lat: 31.0686, lon: 35.0328 },
+        { name: "Arad", country: "Israel", lat: 31.2589, lon: 35.2133 },
+        { name: "Kiryat Shmona", country: "Israel", lat: 33.2078, lon: 35.5706 },
+        { name: "Beit Shemesh", country: "Israel", lat: 31.7486, lon: 34.9897 },
+        { name: "Lod", country: "Israel", lat: 31.9514, lon: 34.8906 },
+        { name: "Ramla", country: "Israel", lat: 31.9297, lon: 34.8617 },
+        { name: "Or Akiva", country: "Israel", lat: 32.5094, lon: 34.9214 },
+        { name: "Afula", country: "Israel", lat: 32.6078, lon: 35.2897 },
+        { name: "Karmiel", country: "Israel", lat: 32.9186, lon: 35.2958 },
+        { name: "Ra'anana", country: "Israel", lat: 32.1847, lon: 34.8708 },
+        { name: "Hod HaSharon", country: "Israel", lat: 32.1514, lon: 34.8889 },
+        { name: "Givatayim", country: "Israel", lat: 32.0706, lon: 34.8119 },
+        { name: "Kiryat Ata", country: "Israel", lat: 32.8036, lon: 35.1028 },
+        { name: "Kiryat Motzkin", country: "Israel", lat: 32.8356, lon: 35.0761 },
+        { name: "Kiryat Yam", country: "Israel", lat: 32.8497, lon: 35.0647 },
+        { name: "Kiryat Bialik", country: "Israel", lat: 32.8281, lon: 35.0836 },
+        
+        // International Cities
         { name: "New York", country: "USA", lat: 40.7128, lon: -74.0060 },
         { name: "London", country: "UK", lat: 51.5074, lon: -0.1278 },
         { name: "Paris", country: "France", lat: 48.8566, lon: 2.3522 },
@@ -1419,7 +1741,15 @@
         { name: "Barcelona", country: "Spain", lat: 41.3851, lon: 2.1734 },
         { name: "Rome", country: "Italy", lat: 41.9028, lon: 12.4964 },
         { name: "Singapore", country: "Singapore", lat: 1.3521, lon: 103.8198 },
-        { name: "Hong Kong", country: "China", lat: 22.3193, lon: 114.1694 }
+        { name: "Hong Kong", country: "China", lat: 22.3193, lon: 114.1694 },
+        { name: "Amsterdam", country: "Netherlands", lat: 52.3676, lon: 4.9041 },
+        { name: "Vienna", country: "Austria", lat: 48.2082, lon: 16.3738 },
+        { name: "Prague", country: "Czech Republic", lat: 50.0755, lon: 14.4378 },
+        { name: "Istanbul", country: "Turkey", lat: 41.0082, lon: 28.9784 },
+        { name: "Athens", country: "Greece", lat: 37.9838, lon: 23.7275 },
+        { name: "Cairo", country: "Egypt", lat: 30.0444, lon: 31.2357 },
+        { name: "Miami", country: "USA", lat: 25.7617, lon: -80.1918 },
+        { name: "Toronto", country: "Canada", lat: 43.6532, lon: -79.3832 }
       ];
 
       const filteredCities = popularCities.filter(city =>
